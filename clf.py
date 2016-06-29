@@ -11,6 +11,16 @@ from hyperopt import fmin, tpe, hp, rand
 from sklearn import cross_validation
 
 
+def log_loss(clf, X, y):
+    result = clf.predict_proba(X)
+    n = 0
+    for r, y_ in zip(result, y):
+        n -= np.log(r[y_])
+    n /= len(result)
+
+    return n
+
+
 if __name__ == '__main__':
     parameters = {
         'n_estimators': [100, 250, 500, 1000],
@@ -36,9 +46,11 @@ if __name__ == '__main__':
 
         #    print 'Predicting...'
 
-        acu = forest.score(testX, testy)
+        #acu = forest.score(testX, testy)
+        acu = log_loss(forest, testX, testy)
 
-        print("Accurate:", acu)
+        #print("Accurate:", acu)
+        print("Log loss:", acu)
         return -acu
 
 

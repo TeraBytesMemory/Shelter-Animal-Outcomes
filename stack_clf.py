@@ -13,6 +13,16 @@ from hyperopt import fmin, tpe, hp, rand
 from sklearn import cross_validation
 
 
+def log_loss(clf, X, y):
+    result = clf.predict_proba(X)
+    n = 0
+    for r, y_ in zip(result, y):
+        n -= np.log(r[y_])
+    n /= len(result)
+
+    return n
+
+
 if __name__ == '__main__':
     parameters = {
         'n_estimators': [100, 250, 500, 1000],
@@ -26,27 +36,15 @@ if __name__ == '__main__':
 
 
     # train
-    ''''
-    df = data_format('train.csv')
-    df['OutcomeType'] = df['OutcomeType'].map({
-        'Adoption': 0 , 'Died': 1, 'Euthanasia': 2,
-        'Return_to_owner': 3, 'Transfer': 4
-    })
-    y = df['OutcomeType'].values
-
-    df = df.drop(['AnimalID', 'OutcomeType', 'OutcomeSubtype'], axis=1)
-    X = df.values
-
-    #df_log = df.drop(['DateTime', 'Name', 'SexuponOutcome', 'AgeuponOutcome'], axis=1)
-    df_log = df
-    #rf_args = {'random_state': 0, 'max_features': 3, 'min_samples_split': 5,
-    #           'max_depth': 10, 'n_jobs': 2, 'n_estimators': 250}
-    '''
+    df_log = data_format('train.csv')
+    df_log = df_log.drop(['AnimalID', 'OutcomeType', 'OutcomeSubtype'], axis=1)
+    df_log = df_log.drop(['DateTime', 'Name', 'SexuponOutcome', 'AgeuponOutcome',
+                          'Breed', 'Color', 'Sex'], axis=1)
 
     X, y = train_data_format('train.csv')
-    lr = RandomForestClassifier()
-    lr.fit(X, y)
-    new_feature = lr.predict(X)
+    lr = LogisticRegression()
+    lr.fit(df_log.values, y)
+    new_feature = lr.predict(df_log.values)
     X = np.hstack((X, new_feature[np.newaxis].T))
 
     def estimator(args):
@@ -78,20 +76,13 @@ if __name__ == '__main__':
 
     print(clf.booster().get_fscore())
 
-    '''
-    #test_data, ids = test_data_format('test.csv')
-    test_df = data_format('test.csv', train=False)
-
-    ids = test_df['ID'].values
-    df = test_df.drop(['ID'], axis=1)
-    test_data = test_df.values
-
-    #df_log = test_df.drop(['DateTime', 'Name', 'SexuponOutcome', 'AgeuponOutcome'], axis=1)
-    df_log = test_df
-    '''
+    df_log = data_format('test.csv', train=False)
+    df_log = df_log.drop(['ID'], axis=1)
+    df_log = df_log.drop(['DateTime', 'Name', 'SexuponOutcome', 'AgeuponOutcome',
+                          'Breed', 'Color', 'Sex'], axis=1)
 
     test_data, ids = test_data_format('test.csv')
-    new_feature = lr.predict(test_data)
+    new_feature = lr.predict(df_log.values)
     test_data = np.hstack((test_data, new_feature[np.newaxis].T))
 
     result = clf.predict_proba(test_data)
