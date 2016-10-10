@@ -54,8 +54,8 @@ if __name__ == '__main__':
         return acu
 
 
-    #best = fmin(estimator, hp_choice, algo=tpe.suggest, max_evals=10)
-    #best = dict([(key, parameters[key][value]) for key, value in best.items()])
+    best = fmin(estimator, hp_choice, algo=tpe.suggest, max_evals=10)
+    best = dict([(key, parameters[key][value]) for key, value in best.items()])
 
     #print("\nBest Model...")
     #estimator(best)
