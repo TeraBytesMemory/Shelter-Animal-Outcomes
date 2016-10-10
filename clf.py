@@ -23,10 +23,10 @@ def log_loss(clf, X, y):
 
 if __name__ == '__main__':
     parameters = {
-        'n_estimators': [100, 250, 500, 1000],
-        'max_depth': [3, 5, 10, 15, 20, 25, 30],
-        'reg_alpha': [3.0, 4.0],
-        'missing': [np.nan, 1.0, 2.0, 3.0]
+        'n_estimators': [100, 250, 500, 750, 1000],
+        'max_depth': [2, 3, 4, 5],
+        'reg_alpha': [2.0, 3.0, 4.0],
+        'missing': [np.nan, 1.0, 2.0, 3.0, 4.0]
     }
 
     hp_choice = dict([(key, hp.choice(key, value))
@@ -37,25 +37,25 @@ if __name__ == '__main__':
 
     def estimator(args):
         print("Args:", args)
-        forest = xgb.XGBClassifier(**args)
+        clf = xgb.XGBClassifier(**args)
 
         trainX, testX, trainy, testy = cross_validation.train_test_split(
             X, y, test_size=0.4, random_state=0)
 
-        forest.fit(trainX, trainy)
+        clf.fit(trainX, trainy)
 
         #    print 'Predicting...'
 
         #acu = forest.score(testX, testy)
-        acu = log_loss(forest, testX, testy)
+        acu = log_loss(clf, testX, testy)
 
         #print("Accurate:", acu)
         print("Log loss:", acu)
-        return -acu
+        return acu
 
 
-    best = fmin(estimator, hp_choice, algo=tpe.suggest, max_evals=5)
-    best = dict([(key, parameters[key][value]) for key, value in best.items()])
+    #best = fmin(estimator, hp_choice, algo=tpe.suggest, max_evals=10)
+    #best = dict([(key, parameters[key][value]) for key, value in best.items()])
 
     #print("\nBest Model...")
     #estimator(best)

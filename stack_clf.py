@@ -37,13 +37,18 @@ if __name__ == '__main__':
 
     # train
     df_log = data_format('train.csv')
+    df_log['OutcomeType'] = df_log['OutcomeType'].map({
+        'Adoption': 0 , 'Died': 0, 'Euthanasia': 0,
+        'Return_to_owner': 1, 'Transfer': 2
+    })
+    df_log_y = df_log['OutcomeType'].values
     df_log = df_log.drop(['AnimalID', 'OutcomeType', 'OutcomeSubtype'], axis=1)
-    df_log = df_log.drop(['DateTime', 'Name', 'SexuponOutcome', 'AgeuponOutcome',
-                          'Breed', 'Color', 'Sex'], axis=1)
+    #df_log = df_log.drop(['DateTime', 'Name', 'SexuponOutcome', 'AgeuponOutcome',
+    #                      'Breed', 'Color', 'Sex', 'Weekend'], axis=1)
 
     X, y = train_data_format('train.csv')
     lr = LogisticRegression()
-    lr.fit(df_log.values, y)
+    lr.fit(df_log.values, df_log_y)
     new_feature = lr.predict(df_log.values)
     X = np.hstack((X, new_feature[np.newaxis].T))
 
@@ -61,7 +66,7 @@ if __name__ == '__main__':
         acu = log_loss(forest, testX, testy)
         #acu = forest.score(testX, testy)
 
-        print("Accurate:", acu)
+        print("Log loss:", acu)
         return -acu
 
 
@@ -78,8 +83,8 @@ if __name__ == '__main__':
 
     df_log = data_format('test.csv', train=False)
     df_log = df_log.drop(['ID'], axis=1)
-    df_log = df_log.drop(['DateTime', 'Name', 'SexuponOutcome', 'AgeuponOutcome',
-                          'Breed', 'Color', 'Sex'], axis=1)
+    #df_log = df_log.drop(['DateTime', 'Name', 'SexuponOutcome', 'AgeuponOutcome',
+    #                      'Breed', 'Color', 'Sex', 'Weekend'], axis=1)
 
     test_data, ids = test_data_format('test.csv')
     new_feature = lr.predict(df_log.values)

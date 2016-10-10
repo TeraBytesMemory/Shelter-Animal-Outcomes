@@ -34,3 +34,31 @@ def date_format(date):
         d = datetime.strptime(date[2:], '%y-%m-%d %H:%M:%S')
 
     return d.hour
+
+def is_weekend(date):
+    try:
+        d = datetime.strptime(date[2:], '%y/%m/%d %H:%M')
+    except:
+        d = datetime.strptime(date[2:], '%y-%m-%d %H:%M:%S')
+
+    return 1 if d.weekday() >= 5 else 0
+
+def is_spring(date):
+    try:
+        d = datetime.strptime(date[2:], '%y/%m/%d %H:%M')
+    except:
+        d = datetime.strptime(date[2:], '%y-%m-%d %H:%M:%S')
+
+    return 1 if d.month >= 3 and d.month <= 5 else 0
+
+# https://www.kaggle.com/amhchiu/shelter-animal-outcomes/color-pattern-colour
+def color_format(color):
+    colors = dict([(x,i) for i, x in enumerate(
+        ["Agouti", "Brindle", "Calico", "Merle", "Point", "Smoke",
+         "Tabby", "Tick", "Tiger", "Torbie", "Tortie", "Tricolor"])])
+
+    for key, value in colors.items():
+        if key in color:
+            return value
+
+    return -1
